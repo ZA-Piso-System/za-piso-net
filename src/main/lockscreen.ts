@@ -31,7 +31,9 @@ export const createLockScreenWindow = (): void => {
     lockScreenWindow.show()
   })
 
-  lockScreenWindow.on('close', (e) => e.preventDefault())
+  if (process.env.NODE_ENV !== 'development') {
+    lockScreenWindow.on('close', (e) => e.preventDefault())
+  }
 
   lockScreenWindow.on('closed', () => {
     lockScreenWindow = null

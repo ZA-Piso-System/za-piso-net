@@ -19,7 +19,7 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  ipcMain.on('open-timer', createTimerScreenWindow)
+  ipcMain.on('test-timer', createTimerScreenWindow)
 
   createLockScreenWindow()
 
