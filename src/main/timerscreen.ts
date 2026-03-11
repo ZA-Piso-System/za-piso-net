@@ -16,15 +16,17 @@ export const createTimerScreenWindow = (): void => {
     height: 200,
     x: width - 400,
     y: 0,
+    autoHideMenuBar: true,
     frame: false,
     movable: false,
     resizable: false,
     show: false,
-    autoHideMenuBar: true,
+    skipTaskbar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      devTools: false
     }
   })
 
@@ -36,8 +38,7 @@ export const createTimerScreenWindow = (): void => {
     // startTimer(15)
   })
 
-  // TODO: test all possible closing hacks on windows
-  // timerWindow.on('close', (e) => e.preventDefault())
+  timerWindow.on('close', (e) => e.preventDefault())
 
   timerWindow.on('closed', () => {
     timerWindow = null

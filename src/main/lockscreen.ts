@@ -17,10 +17,12 @@ export const createLockScreenWindow = (): void => {
     movable: false,
     resizable: false,
     show: false,
+    skipTaskbar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      devTools: false
     }
   })
 
@@ -28,6 +30,8 @@ export const createLockScreenWindow = (): void => {
     if (!lockScreenWindow) return
     lockScreenWindow.show()
   })
+
+  lockScreenWindow.on('close', (e) => e.preventDefault())
 
   lockScreenWindow.on('closed', () => {
     lockScreenWindow = null
