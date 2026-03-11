@@ -1,6 +1,7 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { createLockScreenWindow } from './lockscreen'
+import { createTimerScreenWindow } from './timerscreen'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -18,6 +19,7 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('open-timer', createTimerScreenWindow)
 
   createLockScreenWindow()
 
