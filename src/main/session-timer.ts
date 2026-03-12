@@ -1,10 +1,10 @@
-import { BrowserWindow } from 'electron'
+import { webContents } from 'electron'
 import { createLockScreenWindow } from './lockscreen'
 
 let endTime: number | null = null
 let interval: NodeJS.Timeout | null = null
 
-export const startTimer = (duration: number, windows: BrowserWindow[]): void => {
+export const startTimer = (duration: number): void => {
   endTime = Date.now() + duration * 1000
 
   if (interval) clearInterval(interval)
@@ -15,10 +15,8 @@ export const startTimer = (duration: number, windows: BrowserWindow[]): void => 
     const remainingMs = Math.max(0, endTime - Date.now())
     const remainingSeconds = Math.ceil(remainingMs / 1000)
 
-    windows.forEach((win) => {
-      if (!win.isDestroyed()) {
-        win.webContents.send('timer-update', remainingSeconds)
-      }
+    webContents.getAllWebContents().forEach((wc) => {
+      wc.send('timer-update', remainingSeconds)
     })
 
     if (remainingSeconds <= 0) {

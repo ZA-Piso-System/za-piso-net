@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { createLockScreenWindow } from './lockscreen'
 import { createTimerScreenWindow } from './timerscreen'
+import { initializeWebsocket } from './websocket'
 
 const userConfigPath = path.join(app.getPath('userData'), 'config.json')
 const defaultConfigPath = path.join(__dirname, '../../resources/config.json')
@@ -17,7 +18,7 @@ const config = JSON.parse(fs.readFileSync(userConfigPath, 'utf8'))
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.za.piso-net')
 
@@ -54,3 +55,4 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+initializeWebsocket(config.host)

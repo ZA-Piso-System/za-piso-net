@@ -1,9 +1,8 @@
+import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import { is } from '@electron-toolkit/utils'
 import { closeLockScreenWindow } from './lockscreen'
-import { startTimer } from './session-timer'
 
 let timerWindow: BrowserWindow | null = null
 
@@ -34,8 +33,6 @@ export const createTimerScreenWindow = (): void => {
   timerWindow.on('ready-to-show', () => {
     if (!timerWindow) return
     timerWindow.show()
-
-    startTimer(15 * 60, [timerWindow])
   })
 
   if (process.env.NODE_ENV !== 'development') {
