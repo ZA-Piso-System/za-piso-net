@@ -31,8 +31,13 @@ export default function App(): React.JSX.Element {
   }
 
   return (
-    <div className="h-screen flex justify-center items-center">
-      <div className="text-5xl text-purple-500 font-mono">{secondsToHMS()}</div>
+    <div className="h-screen flex">
+      <div className="w-36 flex justify-center items-center bg-black">
+        <h1 className="text-6xl text-purple-500 font-bold font-mono">04</h1>
+      </div>
+      <div className="flex-1 flex justify-center items-center text-3xl font-mono p-2">
+        {secondsToHMS()}
+      </div>
     </div>
   )
 }

@@ -4,8 +4,8 @@ import { createLockScreenWindow } from './lockscreen'
 let endTime: number | null = null
 let interval: NodeJS.Timeout | null = null
 
-export const startTimer = (durationMs: number, windows: BrowserWindow[]): void => {
-  endTime = Date.now() + durationMs
+export const startTimer = (duration: number, windows: BrowserWindow[]): void => {
+  endTime = Date.now() + duration * 1000
 
   if (interval) clearInterval(interval)
 

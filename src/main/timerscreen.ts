@@ -13,9 +13,9 @@ export const createTimerScreenWindow = (): void => {
   const { width } = screen.getPrimaryDisplay().workAreaSize
 
   timerWindow = new BrowserWindow({
-    width: 400,
-    height: 200,
-    x: width - 400,
+    width: 350,
+    height: 100,
+    x: width - 350,
     y: 0,
     autoHideMenuBar: true,
     frame: false,
@@ -35,7 +35,7 @@ export const createTimerScreenWindow = (): void => {
     if (!timerWindow) return
     timerWindow.show()
 
-    startTimer(15 * 1000, [timerWindow])
+    startTimer(15 * 60, [timerWindow])
   })
 
   if (process.env.NODE_ENV !== 'development') {
