@@ -1,7 +1,18 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, ipcMain } from 'electron'
+import fs from 'fs'
+import path from 'path'
 import { createLockScreenWindow } from './lockscreen'
 import { createTimerScreenWindow } from './timerscreen'
+
+const userConfigPath = path.join(app.getPath('userData'), 'config.json')
+const defaultConfigPath = path.join(__dirname, '../../resources/config.json')
+
+if (!fs.existsSync(userConfigPath)) {
+  fs.copyFileSync(defaultConfigPath, userConfigPath)
+}
+
+const config = JSON.parse(fs.readFileSync(userConfigPath, 'utf8'))
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -20,6 +31,8 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.on('test-timer', createTimerScreenWindow)
+
+  ipcMain.handle('get-app-config', () => config)
 
   createLockScreenWindow()
 
