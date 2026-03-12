@@ -3,23 +3,29 @@ import { addTime, getRemainingSeconds, startTimer, stopTimer } from './session-t
 import { createTimerScreenWindow } from './timerscreen'
 import { createLockScreenWindow } from './lockscreen'
 import { discoverTimerServer } from './discovery'
+import { ClientEvents } from './common/constants/client-events.constant'
+import { SessionEvents } from './common/constants/session-events.constant'
 
+let ws: WebSocket
+let heartbeatInterval: NodeJS.Timeout
 let reconnectTimeout: NodeJS.Timeout | null = null
 
 export const initializeWebsocket = async (configHost: string): Promise<void> => {
   const host = await getServerHost(configHost)
 
-  const ws = new WebSocket(`ws://${host}:5000/ws`)
+  ws = new WebSocket(`ws://${host}:5000/ws`)
 
   ws.on('open', function open() {
     console.log('Websocket Connected')
 
     ws.send(
       JSON.stringify({
-        type: 'client:ready',
+        type: ClientEvents.Ready,
         payload: 'device-id-here'
       })
     )
+
+    startHeartbeat()
   })
 
   ws.on('message', function message(data) {
@@ -33,11 +39,33 @@ export const initializeWebsocket = async (configHost: string): Promise<void> => 
 
   ws.on('close', () => {
     console.log('WebSocket disconnected. Reconnecting in 3s')
-
+    stopHeartbeat()
     reconnect(configHost)
   })
 
   ws.on('error', console.error)
+}
+
+const startHeartbeat = (): void => {
+  heartbeatInterval = setInterval(() => {
+    if (!ws || ws.readyState !== ws.OPEN) return
+    console.log('sending heartbeat')
+
+    ws.send(
+      JSON.stringify({
+        type: ClientEvents.Heartbeat,
+        payload: {
+          deviceId: 'device-id-here',
+          status: 'active',
+          remainingTime: getRemainingSeconds()
+        }
+      })
+    )
+  }, 5_000)
+}
+
+const stopHeartbeat = (): void => {
+  clearInterval(heartbeatInterval)
 }
 
 const reconnect = (configHost: string): void => {
@@ -50,10 +78,10 @@ const reconnect = (configHost: string): void => {
 }
 
 const getServerHost = async (configHost: string): Promise<string> => {
-  if (configHost !== 'local' && configHost !== 'localhost') {
-    return configHost // fixed IP
+  if (configHost !== 'localhost') {
+    return configHost
   }
-  if (configHost === 'localhost') {
+  if (process.env.NODE_ENV === 'development') {
     return '127.0.0.1'
   }
   return await discoverTimerServer()
@@ -61,7 +89,7 @@ const getServerHost = async (configHost: string): Promise<string> => {
 
 const handleEvent = (event: { type: string; payload?: unknown }): void => {
   switch (event.type) {
-    case 'session:add-time':
+    case SessionEvents.AddTime:
       {
         const seconds = event.payload as number
         if (getRemainingSeconds() <= 0) {
@@ -72,7 +100,7 @@ const handleEvent = (event: { type: string; payload?: unknown }): void => {
         }
       }
       break
-    case 'session:stop':
+    case SessionEvents.Stop:
       createLockScreenWindow()
       stopTimer()
       break
