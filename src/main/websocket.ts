@@ -5,13 +5,14 @@ import { createLockScreenWindow } from './lockscreen'
 import { discoverTimerServer } from './discovery'
 import { ClientEvents } from './common/constants/client-events.constant'
 import { SessionEvents } from './common/constants/session-events.constant'
+import config from './config'
 
 let ws: WebSocket
 let heartbeatInterval: NodeJS.Timeout
 let reconnectTimeout: NodeJS.Timeout | null = null
 
-export const initializeWebsocket = async (configHost: string): Promise<void> => {
-  const host = await getServerHost(configHost)
+export const initializeWebsocket = async (): Promise<void> => {
+  const host = await getServerHost(config.host)
 
   ws = new WebSocket(`ws://${host}:5000/ws`)
 
@@ -40,7 +41,7 @@ export const initializeWebsocket = async (configHost: string): Promise<void> => 
   ws.on('close', () => {
     console.log('WebSocket disconnected. Reconnecting in 3s')
     stopHeartbeat()
-    reconnect(configHost)
+    reconnect()
   })
 
   ws.on('error', console.error)
@@ -68,12 +69,12 @@ const stopHeartbeat = (): void => {
   clearInterval(heartbeatInterval)
 }
 
-const reconnect = (configHost: string): void => {
+const reconnect = (): void => {
   if (reconnectTimeout) return
 
   reconnectTimeout = setTimeout(() => {
     reconnectTimeout = null
-    initializeWebsocket(configHost)
+    initializeWebsocket()
   }, 3000)
 }
 

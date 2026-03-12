@@ -1,19 +1,9 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, ipcMain } from 'electron'
-import fs from 'fs'
-import path from 'path'
 import { createLockScreenWindow } from './lockscreen'
 import { createTimerScreenWindow } from './timerscreen'
 import { initializeWebsocket } from './websocket'
-
-const userConfigPath = path.join(app.getPath('userData'), 'config.json')
-const defaultConfigPath = path.join(__dirname, '../../resources/config.json')
-
-if (!fs.existsSync(userConfigPath)) {
-  fs.copyFileSync(defaultConfigPath, userConfigPath)
-}
-
-const config = JSON.parse(fs.readFileSync(userConfigPath, 'utf8'))
+import config from './config'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -55,4 +45,4 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-initializeWebsocket(config.host)
+initializeWebsocket()
