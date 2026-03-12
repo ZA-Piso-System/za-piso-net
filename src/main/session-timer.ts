@@ -26,6 +26,18 @@ export const startTimer = (duration: number): void => {
   }, 1000)
 }
 
+export const getRemainingSeconds = (): number => {
+  if (!endTime) return 0
+  const remainingMs = Math.max(0, endTime - Date.now())
+  const remainingSeconds = Math.ceil(remainingMs / 1000)
+  return remainingSeconds
+}
+
+export const addTime = (seconds: number): void => {
+  if (!endTime) return
+  endTime += seconds * 1000
+}
+
 export const stopTimer = (): void => {
   if (interval) {
     clearInterval(interval)

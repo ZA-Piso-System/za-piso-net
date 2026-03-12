@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { startTimer, stopTimer } from './session-timer'
+import { addTime, getRemainingSeconds, startTimer, stopTimer } from './session-timer'
 import { createTimerScreenWindow } from './timerscreen'
 import { createLockScreenWindow } from './lockscreen'
 import { discoverTimerServer } from './discovery'
@@ -61,9 +61,16 @@ const getServerHost = async (configHost: string): Promise<string> => {
 
 const handleEvent = (event: { type: string; payload?: unknown }): void => {
   switch (event.type) {
-    case 'session:init':
-      createTimerScreenWindow()
-      startTimer(event.payload as number)
+    case 'session:add-time':
+      {
+        const seconds = event.payload as number
+        if (getRemainingSeconds() <= 0) {
+          createTimerScreenWindow()
+          startTimer(seconds)
+        } else {
+          addTime(seconds)
+        }
+      }
       break
     case 'session:stop':
       createLockScreenWindow()
