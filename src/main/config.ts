@@ -12,6 +12,9 @@ const config: AppConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'))
 
 if (!config.deviceId) {
   config.deviceId = uuidv4()
+  if (process.env.NODE_ENV !== 'development') {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+  }
 }
 
 export default config
