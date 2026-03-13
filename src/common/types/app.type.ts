@@ -1,4 +1,6 @@
 export interface AppConfig {
-  host: string
+  apiUrl: string
+  wsUrl: string
+  deviceId: string
   pcNo: number
 }

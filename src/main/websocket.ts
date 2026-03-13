@@ -1,29 +1,41 @@
 import WebSocket from 'ws'
 import config from './config'
 import { createLockScreenWindow } from './lockscreen'
-import { addTime, getRemainingSeconds, startTimer, stopTimer } from './session-timer'
+import {
+  addTime,
+  getRemainingSeconds,
+  getStartAt,
+  getStatus,
+  startTimer,
+  stopTimer
+} from './session-timer'
 import { createTimerScreenWindow } from './timerscreen'
-import { ClientEvents } from '../common/constants/client-events.constant'
-import { SessionEvents } from '../common/constants/session-events.constant'
+import { ClientEvent } from '../common/types/client-event.type'
+import { SessionEvent } from '../common/types/session-event.type'
+import { ServerEvent } from '../common/types/server-event.type'
+import { Client } from '../common/types/client.type'
 
 let ws: WebSocket
 let heartbeatInterval: NodeJS.Timeout
 let reconnectTimeout: NodeJS.Timeout | null = null
 
 export const initializeWebsocket = async (): Promise<void> => {
-  ws = new WebSocket(`ws://${config.host}:5000/ws`)
+  ws = new WebSocket(config.wsUrl)
 
   ws.on('open', function open() {
-    console.log('Websocket Connected')
-
     ws.send(
       JSON.stringify({
-        type: ClientEvents.Ready,
-        payload: 'device-id-here'
+        type: ClientEvent.Ready,
+        payload: {
+          deviceId: config.deviceId,
+          pcNo: config.pcNo,
+          status: getStatus(),
+          startAt: getStartAt(),
+          remainingSeconds: getRemainingSeconds(),
+          lastSeen: Date.now()
+        } satisfies Client
       })
     )
-
-    startHeartbeat()
   })
 
   ws.on('message', function message(data) {
@@ -47,16 +59,18 @@ export const initializeWebsocket = async (): Promise<void> => {
 const startHeartbeat = (): void => {
   heartbeatInterval = setInterval(() => {
     if (!ws || ws.readyState !== ws.OPEN) return
-    console.log('sending heartbeat')
 
     ws.send(
       JSON.stringify({
-        type: ClientEvents.Heartbeat,
+        type: ClientEvent.Heartbeat,
         payload: {
-          deviceId: 'device-id-here',
-          status: 'active',
-          remainingTime: getRemainingSeconds()
-        }
+          deviceId: config.deviceId,
+          pcNo: config.pcNo,
+          status: getStatus(),
+          startAt: getStartAt(),
+          remainingSeconds: getRemainingSeconds(),
+          lastSeen: Date.now()
+        } satisfies Client
       })
     )
   }, 5_000)
@@ -77,7 +91,10 @@ const reconnect = (): void => {
 
 const handleEvent = (event: { type: string; payload?: unknown }): void => {
   switch (event.type) {
-    case SessionEvents.AddTime:
+    case ServerEvent.Ack:
+      startHeartbeat()
+      break
+    case SessionEvent.AddTime:
       {
         const seconds = event.payload as number
         if (getRemainingSeconds() <= 0) {
@@ -88,7 +105,7 @@ const handleEvent = (event: { type: string; payload?: unknown }): void => {
         }
       }
       break
-    case SessionEvents.Stop:
+    case SessionEvent.Stop:
       createLockScreenWindow()
       stopTimer()
       break

@@ -1,4 +1,6 @@
 {
-  "host": "localhost",
-  "pcNo": 2
+  "apiUrl": "localhost",
+  "wsUrl": "ws://localhost:5000/ws",
+  "deviceId": "",
+  "pcNo": 1
 }
