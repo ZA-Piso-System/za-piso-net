@@ -1,20 +1,17 @@
 import WebSocket from 'ws'
+import config from './config'
+import { createLockScreenWindow } from './lockscreen'
 import { addTime, getRemainingSeconds, startTimer, stopTimer } from './session-timer'
 import { createTimerScreenWindow } from './timerscreen'
-import { createLockScreenWindow } from './lockscreen'
-import { discoverTimerServer } from './discovery'
-import { ClientEvents } from './common/constants/client-events.constant'
-import { SessionEvents } from './common/constants/session-events.constant'
-import config from './config'
+import { ClientEvents } from '../common/constants/client-events.constant'
+import { SessionEvents } from '../common/constants/session-events.constant'
 
 let ws: WebSocket
 let heartbeatInterval: NodeJS.Timeout
 let reconnectTimeout: NodeJS.Timeout | null = null
 
 export const initializeWebsocket = async (): Promise<void> => {
-  const host = await getServerHost(config.host)
-
-  ws = new WebSocket(`ws://${host}:5000/ws`)
+  ws = new WebSocket(`ws://${config.host}:5000/ws`)
 
   ws.on('open', function open() {
     console.log('Websocket Connected')
@@ -76,16 +73,6 @@ const reconnect = (): void => {
     reconnectTimeout = null
     initializeWebsocket()
   }, 3000)
-}
-
-const getServerHost = async (configHost: string): Promise<string> => {
-  if (configHost !== 'localhost') {
-    return configHost
-  }
-  if (process.env.NODE_ENV === 'development') {
-    return '127.0.0.1'
-  }
-  return await discoverTimerServer()
 }
 
 const handleEvent = (event: { type: string; payload?: unknown }): void => {

@@ -36,7 +36,7 @@ export default function App(): React.JSX.Element {
     <div className="h-screen flex">
       <div className="w-36 flex justify-center items-center bg-black">
         <h1 className="text-6xl text-purple-500 font-bold font-mono">
-          {config?.pc_no.toString().padStart(2, '0')}
+          {config?.pcNo.toString().padStart(2, '0')}
         </h1>
       </div>
       <div className="flex-1 flex justify-center items-center text-3xl font-mono p-2">

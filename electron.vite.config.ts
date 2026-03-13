@@ -6,6 +6,15 @@ export default defineConfig({
   main: {},
   preload: {},
   renderer: {
+    build: {
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'src/renderer/index.html'),
+          lockscreen: resolve(__dirname, 'src/renderer/lockscreen/index.html'),
+          timerscreen: resolve(__dirname, 'src/renderer/timerscreen/index.html')
+        }
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer')

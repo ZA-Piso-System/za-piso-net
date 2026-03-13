@@ -1,15 +1,12 @@
 import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { AppConfig } from './common/types/app.type'
+import { AppConfig } from '../common/types/app.type'
 
-const userConfigPath = path.join(app.getPath('userData'), 'config.json')
-const defaultConfigPath = path.join(__dirname, '../../resources/config.json')
+const configPath = app.isPackaged
+  ? path.join(process.resourcesPath, 'config.json') // production
+  : path.join(process.cwd(), 'resources/config.json') // development
 
-if (!fs.existsSync(userConfigPath)) {
-  fs.copyFileSync(defaultConfigPath, userConfigPath)
-}
-
-const config: AppConfig = JSON.parse(fs.readFileSync(userConfigPath, 'utf8'))
+const config: AppConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'))
 
 export default config

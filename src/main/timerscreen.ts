@@ -7,8 +7,6 @@ import { closeLockScreenWindow } from './lockscreen'
 let timerWindow: BrowserWindow | null = null
 
 export const createTimerScreenWindow = (): void => {
-  closeLockScreenWindow()
-
   const { width } = screen.getPrimaryDisplay().workAreaSize
 
   timerWindow = new BrowserWindow({
@@ -50,6 +48,8 @@ export const createTimerScreenWindow = (): void => {
   } else {
     timerWindow.loadFile(join(__dirname, '../renderer/timerscreen/index.html'))
   }
+
+  closeLockScreenWindow()
 }
 
 export const closeTimerScreenWindow = (): void => {

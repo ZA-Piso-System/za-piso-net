@@ -1,14 +1,12 @@
+import { is } from '@electron-toolkit/utils'
 import { BrowserWindow } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import { is } from '@electron-toolkit/utils'
 import { closeTimerScreenWindow } from './timerscreen'
 
 let lockScreenWindow: BrowserWindow | null = null
 
 export const createLockScreenWindow = (): void => {
-  closeTimerScreenWindow()
-
   lockScreenWindow = new BrowserWindow({
     alwaysOnTop: true,
     autoHideMenuBar: true,
@@ -46,6 +44,8 @@ export const createLockScreenWindow = (): void => {
   } else {
     lockScreenWindow.loadFile(join(__dirname, '../renderer/lockscreen/index.html'))
   }
+
+  closeTimerScreenWindow()
 }
 
 export const closeLockScreenWindow = (): void => {

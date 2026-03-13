@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react'
-
-interface AppConfig {
-  host: string
-  pc_no: number
-}
+import { AppConfig } from 'src/common/types/app.type'
 
 export const useAppConfig = (): AppConfig | null => {
   const [config, setConfig] = useState<AppConfig | null>(null)
