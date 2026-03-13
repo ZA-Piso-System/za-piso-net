@@ -1,5 +1,5 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import config from './config'
 import { createLockScreenWindow } from './lockscreen'
 import { initializeWebsocket } from './websocket'
@@ -10,6 +10,8 @@ import { initializeWebsocket } from './websocket'
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.za.piso-net')
+
+  globalShortcut.register('F11', () => {})
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
