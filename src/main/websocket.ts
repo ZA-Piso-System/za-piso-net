@@ -3,6 +3,7 @@ import config from './config'
 import { createLockScreenWindow } from './lockscreen'
 import {
   addTime,
+  getEndAt,
   getRemainingSeconds,
   getStartAt,
   getStatus,
@@ -31,6 +32,7 @@ export const initializeWebsocket = async (): Promise<void> => {
           pcNo: config.pcNo,
           status: getStatus(),
           startAt: getStartAt(),
+          endAt: getEndAt(),
           remainingSeconds: getRemainingSeconds(),
           lastSeen: Date.now()
         } satisfies Client
@@ -68,6 +70,7 @@ const startHeartbeat = (): void => {
           pcNo: config.pcNo,
           status: getStatus(),
           startAt: getStartAt(),
+          endAt: getEndAt(),
           remainingSeconds: getRemainingSeconds(),
           lastSeen: Date.now()
         } satisfies Client

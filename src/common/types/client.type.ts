@@ -5,6 +5,7 @@ export interface Client {
   pcNo: number
   status: Status
   startAt: number | null
+  endAt: number | null
   remainingSeconds: number
   lastSeen: number
 }

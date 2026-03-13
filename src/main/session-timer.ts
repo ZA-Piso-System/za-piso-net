@@ -47,12 +47,16 @@ export const stopTimer = (): void => {
   endAt = null
 }
 
+export const getStatus = (): Status => {
+  return status
+}
+
 export const getStartAt = (): number | null => {
   return startAt
 }
 
-export const getStatus = (): Status => {
-  return status
+export const getEndAt = (): number | null => {
+  return endAt
 }
 
 export const getRemainingSeconds = (): number => {
