@@ -8,7 +8,7 @@ let lockScreenWindow: BrowserWindow | null = null
 
 export const createLockScreenWindow = (): void => {
   lockScreenWindow = new BrowserWindow({
-    kiosk: true,
+    kiosk: process.env.NODE_ENV !== 'development',
     alwaysOnTop: true,
     autoHideMenuBar: true,
     fullscreen: true,
