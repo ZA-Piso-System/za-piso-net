@@ -7,6 +7,8 @@ import { closeTimerScreenWindow } from './timerscreen'
 let lockScreenWindow: BrowserWindow | null = null
 
 export const createLockScreenWindow = (): void => {
+  if (lockScreenWindow) return
+
   lockScreenWindow = new BrowserWindow({
     kiosk: process.env.NODE_ENV !== 'development',
     alwaysOnTop: true,
