@@ -25,6 +25,8 @@ export const createLockScreenWindow = (): void => {
     }
   })
 
+  lockScreenWindow.setAlwaysOnTop(true, 'screen-saver')
+
   lockScreenWindow.on('ready-to-show', () => {
     if (!lockScreenWindow) return
     lockScreenWindow.show()
