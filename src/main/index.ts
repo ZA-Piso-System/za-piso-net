@@ -3,6 +3,7 @@ import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import config from './config'
 import { createLockScreenWindow } from './lockscreen'
 import { initializeWebsocket } from './websocket'
+import { setupTask } from './setup-task'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -32,6 +33,8 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createLockScreenWindow()
   })
+
+  setupTask()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
