@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AppConfig } from 'src/common/types/app.type'
+import { AppConfig } from 'src/common/types/config.type'
 
 export const useAppConfig = (): AppConfig | null => {
   const [config, setConfig] = useState<AppConfig | null>(null)

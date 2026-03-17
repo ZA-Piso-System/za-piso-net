@@ -1,17 +1,14 @@
 import { webContents } from 'electron'
 import { createLockScreenWindow } from './lockscreen'
-import { Status } from '../common/types/status.type'
 
 let interval: NodeJS.Timeout | null = null
 
-let status: Status = Status.Idle
 let startAt: number | null = null
 let endAt: number | null = null
 
-export const startTimer = (duration: number): void => {
-  status = Status.Active
-  startAt = Date.now()
-  endAt = Date.now() + duration * 1000
+export const startTimer = (startTime: number, endTime: number): void => {
+  startAt = startTime
+  endAt = endTime
 
   if (interval) clearInterval(interval)
 
@@ -32,9 +29,9 @@ export const startTimer = (duration: number): void => {
   }, 1000)
 }
 
-export const addTime = (seconds: number): void => {
-  if (!endAt) return
-  endAt += seconds * 1000
+export const updateTime = (startTime: number, endTime: number): void => {
+  startAt = startTime
+  endAt = endTime
 }
 
 export const stopTimer = (): void => {
@@ -42,13 +39,8 @@ export const stopTimer = (): void => {
     clearInterval(interval)
     interval = null
   }
-  status = Status.Idle
   startAt = null
   endAt = null
-}
-
-export const getStatus = (): Status => {
-  return status
 }
 
 export const getStartAt = (): number | null => {

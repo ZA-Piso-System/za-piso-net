@@ -1,9 +1,13 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
-import config from './config'
+import { getAppConfig, saveAppConfig } from './config/app.config'
+import { getDeviceConfig, saveDeviceConfig } from './config/device.config'
+import { getMacAddress } from './get-mac-address'
+import { createInitialSetupWindow } from './initial-setup.screen'
 import { createLockScreenWindow } from './lockscreen'
-import { initializeWebsocket } from './websocket'
+import { registerDevice } from './services/device.service'
 import { setupTask } from './setup-task'
+import { initializeWebsocket } from './websocket'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -23,10 +27,26 @@ app.whenReady().then(async () => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('get-mac-address', () => getMacAddress())
+  ipcMain.handle(
+    'register-device',
+    async (_, formData: { apiUrl: string; wsUrl: string; macAddress: string; token: string }) => {
+      saveAppConfig({ apiUrl: formData.apiUrl, wsUrl: formData.wsUrl })
 
-  ipcMain.handle('get-app-config', () => config)
+      const macAddress = getMacAddress()
+      if (!macAddress) return
 
-  createLockScreenWindow()
+      const result = await registerDevice({
+        macAddress,
+        registrationToken: formData.token
+      })
+
+      saveDeviceConfig(result.data)
+
+      app.relaunch()
+      app.exit(0)
+    }
+  )
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -35,6 +55,19 @@ app.whenReady().then(async () => {
   })
 
   setupTask()
+
+  const appConfig = getAppConfig()
+  const deviceConfig = getDeviceConfig()
+
+  ipcMain.handle('get-app-config', () => appConfig)
+  ipcMain.handle('get-device-config', () => deviceConfig)
+
+  if (!appConfig || !deviceConfig) {
+    createInitialSetupWindow()
+    return
+  }
+
+  createLockScreenWindow()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

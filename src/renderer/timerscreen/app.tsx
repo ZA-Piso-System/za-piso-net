@@ -1,8 +1,8 @@
-import { useAppConfig } from '@renderer/hooks/useAppConfig'
+import { useDeviceConfig } from '@renderer/hooks/useDeviceConfig'
 import { useEffect, useState } from 'react'
 
 export default function App(): React.JSX.Element {
-  const config = useAppConfig()
+  const config = useDeviceConfig()
   const [remaining, setRemaining] = useState<number>(0)
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function App(): React.JSX.Element {
     <div className="h-screen flex">
       <div className="w-36 flex justify-center items-center bg-black">
         <h1 className="text-6xl text-purple-500 font-bold font-mono">
-          {config?.pcNo.toString().padStart(2, '0')}
+          {config?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>
       <div className="flex-1 flex justify-center items-center text-3xl font-mono p-2">

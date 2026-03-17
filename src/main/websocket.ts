@@ -1,40 +1,33 @@
 import WebSocket from 'ws'
-import config from './config'
-import { createLockScreenWindow } from './lockscreen'
-import {
-  addTime,
-  getEndAt,
-  getRemainingSeconds,
-  getStartAt,
-  getStatus,
-  startTimer,
-  stopTimer
-} from './session-timer'
-import { createTimerScreenWindow } from './timerscreen'
 import { ClientEvent } from '../common/types/client-event.type'
-import { SessionEvent } from '../common/types/session-event.type'
-import { ServerEvent } from '../common/types/server-event.type'
 import { Client } from '../common/types/client.type'
+import { ServerEvent } from '../common/types/server-event.type'
+import { SessionEvent } from '../common/types/session-event.type'
+import { getAppConfig } from './config/app.config'
+import { getDeviceConfig } from './config/device.config'
+import { createLockScreenWindow } from './lockscreen'
+import { getRemainingSeconds, startTimer, stopTimer, updateTime } from './session-timer'
+import { createTimerScreenWindow } from './timerscreen'
+import { Session } from '../common/types/session.type'
 
 let ws: WebSocket
 let heartbeatInterval: NodeJS.Timeout
 let reconnectTimeout: NodeJS.Timeout | null = null
 
 export const initializeWebsocket = async (): Promise<void> => {
-  ws = new WebSocket(config.wsUrl)
+  const appConfig = getAppConfig()
+  const deviceConfig = getDeviceConfig()
+
+  if (!appConfig || !deviceConfig) return
+
+  ws = new WebSocket(appConfig.wsUrl)
 
   ws.on('open', function open() {
     ws.send(
       JSON.stringify({
         type: ClientEvent.Ready,
         payload: {
-          deviceId: config.deviceId,
-          pcNo: config.pcNo,
-          status: getStatus(),
-          startAt: getStartAt(),
-          endAt: getEndAt(),
-          remainingSeconds: getRemainingSeconds(),
-          lastSeen: Date.now()
+          id: deviceConfig.id
         } satisfies Client
       })
     )
@@ -59,6 +52,10 @@ export const initializeWebsocket = async (): Promise<void> => {
 }
 
 const startHeartbeat = (): void => {
+  const deviceConfig = getDeviceConfig()
+
+  if (!deviceConfig) return
+
   heartbeatInterval = setInterval(() => {
     if (!ws || ws.readyState !== ws.OPEN) return
 
@@ -66,13 +63,7 @@ const startHeartbeat = (): void => {
       JSON.stringify({
         type: ClientEvent.Heartbeat,
         payload: {
-          deviceId: config.deviceId,
-          pcNo: config.pcNo,
-          status: getStatus(),
-          startAt: getStartAt(),
-          endAt: getEndAt(),
-          remainingSeconds: getRemainingSeconds(),
-          lastSeen: Date.now()
+          id: deviceConfig.id
         } satisfies Client
       })
     )
@@ -89,22 +80,33 @@ const reconnect = (): void => {
   reconnectTimeout = setTimeout(() => {
     reconnectTimeout = null
     initializeWebsocket()
-  }, 3000)
+  }, 3_000)
 }
 
 const handleEvent = (event: { type: string; payload?: unknown }): void => {
   switch (event.type) {
     case ServerEvent.Ack:
-      startHeartbeat()
+      {
+        const payload = event.payload as Session
+        setTimeout(() => {
+          if (payload.startAt && payload.endAt) {
+            createTimerScreenWindow()
+            startTimer(payload.startAt, payload.endAt)
+          }
+        }, 2_000)
+        startHeartbeat()
+      }
       break
     case SessionEvent.AddTime:
       {
-        const seconds = event.payload as number
-        if (getRemainingSeconds() <= 0) {
-          createTimerScreenWindow()
-          startTimer(seconds)
-        } else {
-          addTime(seconds)
+        const payload = event.payload as Session
+        if (payload.startAt && payload.endAt) {
+          if (getRemainingSeconds() <= 0) {
+            createTimerScreenWindow()
+            startTimer(payload.startAt, payload.endAt)
+          } else {
+            updateTime(payload.startAt, payload.endAt)
+          }
         }
       }
       break
@@ -113,6 +115,6 @@ const handleEvent = (event: { type: string; payload?: unknown }): void => {
       stopTimer()
       break
     default:
-      console.warn('unknown event', event.type)
+      console.warn('Unknown event', event.type)
   }
 }

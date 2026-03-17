@@ -10,6 +10,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'src/renderer/index.html'),
+          initialsetupscreen: resolve(__dirname, 'src/renderer/initialsetupscreen/index.html'),
           lockscreen: resolve(__dirname, 'src/renderer/lockscreen/index.html'),
           timerscreen: resolve(__dirname, 'src/renderer/timerscreen/index.html')
         }
