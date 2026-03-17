@@ -1,5 +1,7 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import fs from 'fs'
+import path from 'path'
 import { getAppConfig, saveAppConfig } from './config/app.config'
 import { getDeviceConfig, saveDeviceConfig } from './config/device.config'
 import { getMacAddress } from './get-mac-address'
@@ -47,6 +49,19 @@ app.whenReady().then(async () => {
       app.exit(0)
     }
   )
+  ipcMain.handle('get-images', () => {
+    const userDataPath = app.getPath('userData')
+    const imagesDir = path.join(userDataPath, 'images')
+    if (!fs.existsSync(imagesDir)) return []
+    const files = fs.readdirSync(imagesDir)
+
+    return files
+      .filter((file) => /\.(jpg|jpeg|png|webp)$/i.test(file))
+      .map((file) => {
+        const buffer = fs.readFileSync(path.join(imagesDir, file))
+        return `data:image/jpeg;base64,${buffer.toString('base64')}`
+      })
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
