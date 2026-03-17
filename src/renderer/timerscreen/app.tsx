@@ -34,8 +34,8 @@ export default function App(): React.JSX.Element {
 
   return (
     <div className="h-screen flex">
-      <div className="w-36 flex justify-center items-center bg-black">
-        <h1 className="text-6xl text-purple-500 font-bold font-mono">
+      <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-blue-800 w-36 flex justify-center items-center">
+        <h1 className="text-6xl text-white font-bold font-[Audiowide]">
           {config?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>

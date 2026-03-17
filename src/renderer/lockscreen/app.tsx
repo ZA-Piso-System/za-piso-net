@@ -34,7 +34,7 @@ export default function App(): React.JSX.Element {
         <h2 className="text-5xl text-white font-bold font-[Audiowide]">ZA Pisonet</h2>
       </div>
       <div className="absolute top-10 right-10">
-        <h1 className="text-8xl text-white font-bold font-mono">
+        <h1 className="text-8xl text-white font-bold font-[Audiowide]">
           {config?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>
