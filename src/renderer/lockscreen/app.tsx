@@ -30,11 +30,11 @@ export default function App(): React.JSX.Element {
       {visibleImages.map((image, i) => (
         <img key={i} src={image} className="h-full object-cover" />
       ))}
-      <div className="bg-white/50 flex justify-center items-center">
-        <h2 className="text-5xl font-bold">ZA Pisonet</h2>
+      <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-blue-800 flex justify-center items-center">
+        <h2 className="text-5xl text-white font-bold font-[Audiowide]">ZA Pisonet</h2>
       </div>
       <div className="absolute top-10 right-10">
-        <h1 className="text-8xl text-purple-500 font-bold font-mono">
+        <h1 className="text-8xl text-white font-bold font-mono">
           {config?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>
