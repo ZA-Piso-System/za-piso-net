@@ -68,7 +68,7 @@ export default function App(): React.JSX.Element {
         </h1>
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-10 bg-black/50 text-white text-center p-4">
-        <div className="font-bold uppercase">This pc will turn of in</div>
+        <div className="font-bold uppercase">This pc will turn off in</div>
         <div className="text-3xl font-bold font-mono">{secondsToHMS()}</div>
       </div>
     </div>
