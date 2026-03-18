@@ -3,6 +3,7 @@ import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { closeLockScreenWindow } from './lockscreen'
+import { stopAutoShutdownTimer } from './auto-shutdown'
 
 let timerWindow: BrowserWindow | null = null
 
@@ -51,6 +52,7 @@ export const createTimerScreenWindow = (): void => {
   }
 
   closeLockScreenWindow()
+  stopAutoShutdownTimer()
 }
 
 export const closeTimerScreenWindow = (): void => {
