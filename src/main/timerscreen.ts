@@ -21,7 +21,6 @@ export const createTimerScreenWindow = (): void => {
     movable: false,
     resizable: false,
     show: false,
-    skipTaskbar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
