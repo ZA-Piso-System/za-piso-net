@@ -56,8 +56,8 @@ export default function App(): React.JSX.Element {
 
   return (
     <div className="h-screen grid grid-cols-4">
-      {visibleImages.map((image, i) => (
-        <img key={i} src={image} className="h-full object-cover" />
+      {visibleImages.map((imageUrl, i) => (
+        <img key={i} src={imageUrl} className="h-full object-cover" />
       ))}
       <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-blue-800 flex justify-center items-center">
         <h2 className="text-5xl text-white font-bold font-[Audiowide]">ZA Pisonet</h2>

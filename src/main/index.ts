@@ -1,5 +1,5 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain, protocol } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import { getAppConfig, saveAppConfig } from './config/app.config'
@@ -17,6 +17,17 @@ import { initializeWebsocket } from './websocket'
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.za.piso-net')
+
+  protocol.registerFileProtocol('app', (request, callback) => {
+    const url = new URL(request.url)
+    const fileName = path.basename(url.pathname)
+    const imagesDir = path.join(app.getPath('userData'), 'images')
+    const filePath = path.join(imagesDir, fileName)
+    if (!fs.existsSync(filePath)) {
+      console.error('File not found:', filePath)
+    }
+    callback(filePath)
+  })
 
   globalShortcut.register('F11', () => {})
 
@@ -50,17 +61,14 @@ app.whenReady().then(async () => {
     }
   )
   ipcMain.handle('get-images', () => {
-    const userDataPath = app.getPath('userData')
-    const imagesDir = path.join(userDataPath, 'images')
+    const imagesDir = path.join(app.getPath('userData'), 'images')
     if (!fs.existsSync(imagesDir)) return []
-    const files = fs.readdirSync(imagesDir)
 
+    const files = fs
+      .readdirSync(imagesDir)
+      .filter((f) => /\.(jpg|jpeg|png|webp)$/i.test(f))
+      .map((f) => `app://images/${encodeURIComponent(f)}`)
     return files
-      .filter((file) => /\.(jpg|jpeg|png|webp)$/i.test(file))
-      .map((file) => {
-        const buffer = fs.readFileSync(path.join(imagesDir, file))
-        return `data:image/jpeg;base64,${buffer.toString('base64')}`
-      })
   })
 
   app.on('activate', function () {
