@@ -1,21 +1,48 @@
-## Project Setup
+## 🧰 Prerequisites
+Make sure you have the following installed:
+- Node.js (latest LTS version)
+- Git
 
-### Install
+### Verify installation
+```
+node -v
+npm -v
+git -v
+```
 
+## 📦 Install pnpm
+```
+npm install -g pnpm
+```
+
+### Verify installation
+```
+pnpm -v
+```
+
+## ⚙️ Running the App Locally
+### 1. Clone the repository:
+```
+git clone git@github.com:ZA-Piso-System/za-piso-net.git
+cd za-piso-net
+```
+
+### 2. Install dependencies:
 ```
 pnpm install
 ```
 
-### Development
-
+## 🚀 Start the App
+### 3. Start the development server:
 ```
-pnpm dev
+pnpm run dev
 ```
 
-### Build
+## 🏗️ Build
 
 ```
 # For windows
+pnpm build
 pnpm build:win
 
 # For macOS
