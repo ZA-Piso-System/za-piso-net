@@ -42,7 +42,6 @@ pnpm run dev
 
 ```
 # For windows
-pnpm build
 pnpm build:win
 
 # For macOS
