@@ -43,21 +43,31 @@ app.whenReady().then(async () => {
   ipcMain.handle('get-mac-address', () => getMacAddress())
   ipcMain.handle(
     'register-device',
-    async (_, formData: { apiUrl: string; wsUrl: string; macAddress: string; token: string }) => {
-      saveAppConfig({ apiUrl: formData.apiUrl, wsUrl: formData.wsUrl })
+    async (
+      _,
+      formData: {
+        apiUrl: string
+        wsUrl: string
+        macAddress: string
+        token: string
+        appName: string
+      }
+    ) => {
+      saveAppConfig({ apiUrl: formData.apiUrl, wsUrl: formData.wsUrl, appName: formData.appName })
 
-      const macAddress = getMacAddress()
-      if (!macAddress) return
+      setTimeout(async () => {
+        const macAddress = getMacAddress()
+        if (!macAddress) return
 
-      const result = await registerDevice({
-        macAddress,
-        registrationToken: formData.token
-      })
+        const result = await registerDevice({
+          macAddress,
+          registrationToken: formData.token
+        })
 
-      saveDeviceConfig(result.data)
-
-      app.relaunch()
-      app.exit(0)
+        saveDeviceConfig(result.data)
+        app.relaunch()
+        app.exit(0)
+      }, 1_000)
     }
   )
   ipcMain.handle('get-images', () => {

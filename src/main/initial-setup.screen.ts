@@ -8,11 +8,7 @@ export const createInitialSetupWindow = (): void => {
   if (win) return
 
   win = new BrowserWindow({
-    kiosk: process.env.NODE_ENV !== 'development',
-    alwaysOnTop: true,
     autoHideMenuBar: true,
-    fullscreen: true,
-    frame: false,
     movable: false,
     resizable: false,
     show: false,

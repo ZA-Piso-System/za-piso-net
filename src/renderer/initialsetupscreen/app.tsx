@@ -4,12 +4,14 @@ export default function App(): React.JSX.Element {
   const [apiUrl, setApiUrl] = useState<string>('')
   const [wsUrl, setWsUrl] = useState<string>('')
   const [token, setToken] = useState<string>('')
+  const [appName, setAppName] = useState<string>('')
 
   const handleRegister = async (): Promise<void> => {
     await window.electron.ipcRenderer.invoke('register-device', {
       apiUrl,
       wsUrl,
-      token
+      token,
+      appName
     })
   }
 
@@ -37,6 +39,13 @@ export default function App(): React.JSX.Element {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder="Registration Token"
+            type="text"
+          />
+          <input
+            className="border border-gray-500 rounded-md px-2 py-1"
+            value={appName}
+            onChange={(e) => setAppName(e.target.value)}
+            placeholder="App Name"
             type="text"
           />
           <button

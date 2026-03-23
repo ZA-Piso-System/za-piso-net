@@ -1,8 +1,10 @@
+import { useAppConfig } from '@renderer/hooks/useAppConfig'
 import { useDeviceConfig } from '@renderer/hooks/useDeviceConfig'
 import { useEffect, useState } from 'react'
 
 export default function App(): React.JSX.Element {
-  const config = useDeviceConfig()
+  const appConfig = useAppConfig()
+  const deviceConfig = useDeviceConfig()
 
   const [images, setImages] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState<number>(0)
@@ -60,11 +62,11 @@ export default function App(): React.JSX.Element {
         <img key={i} src={imageUrl} className="h-full object-cover" />
       ))}
       <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-blue-800 flex justify-center items-center">
-        <h2 className="text-5xl text-white font-bold font-[Audiowide]">ZA Pisonet</h2>
+        <h2 className="text-5xl text-white font-bold font-[Audiowide]">{appConfig?.appName}</h2>
       </div>
       <div className="absolute top-10 right-10">
         <h1 className="text-8xl text-white font-bold font-[Audiowide]">
-          {config?.deviceNumber.toString().padStart(2, '0')}
+          {deviceConfig?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-10 bg-black/50 text-white text-center p-4">
