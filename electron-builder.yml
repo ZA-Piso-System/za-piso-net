@@ -2,6 +2,11 @@ appId: com.electron.app
 productName: za-piso-net
 directories:
   buildResources: build
+extraResources:
+  - from: "resources/watchdog.exe"
+    to: "watchdog.exe"
+  - from: "resources/start.vbs"
+    to: "start.vbs"
 files:
   - '!**/.vscode/*'
   - '!src/*'
