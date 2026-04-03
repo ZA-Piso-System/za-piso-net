@@ -41,6 +41,10 @@ export const stopTimer = (): void => {
   }
   startAt = null
   endAt = null
+
+  webContents.getAllWebContents().forEach((wc) => {
+    wc.send('timer-stop')
+  })
 }
 
 export const getStartAt = (): number | null => {

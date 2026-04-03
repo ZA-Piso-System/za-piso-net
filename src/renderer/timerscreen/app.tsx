@@ -1,4 +1,6 @@
 import { useDeviceConfig } from '@renderer/hooks/useDeviceConfig'
+import { secondsToHMS } from '@renderer/utils/number.util'
+import { LogOutIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function App(): React.JSX.Element {
@@ -18,18 +20,8 @@ export default function App(): React.JSX.Element {
     }
   }, [])
 
-  const secondsToHMS = (): string => {
-    const hours = Math.floor(remaining / 3600)
-    const minutes = Math.floor((remaining % 3600) / 60)
-    const seconds = remaining % 60
-
-    const formatted = [
-      String(hours).padStart(2, '0'),
-      String(minutes).padStart(2, '0'),
-      String(seconds).padStart(2, '0')
-    ].join(':')
-
-    return formatted
+  const handleExit = (): void => {
+    window.electron.ipcRenderer.invoke('exit')
   }
 
   return (
@@ -39,8 +31,16 @@ export default function App(): React.JSX.Element {
           {config?.deviceNumber.toString().padStart(2, '0')}
         </h1>
       </div>
-      <div className="flex-1 flex justify-center items-center text-3xl font-mono p-2">
-        {secondsToHMS()}
+      <div className="relative flex-1 flex justify-center items-center text-3xl font-mono p-2">
+        {secondsToHMS(remaining)}
+        <div className="absolute bottom-2">
+          <button
+            className="bg-red-600 hover:bg-red-400 text-white p-2 rounded-md"
+            onClick={handleExit}
+          >
+            <LogOutIcon className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   )

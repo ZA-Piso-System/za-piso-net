@@ -14,7 +14,7 @@ export const createTimerScreenWindow = (): void => {
 
   timerWindow = new BrowserWindow({
     width: 350,
-    height: 100,
+    height: 130,
     x: width - 350,
     y: 0,
     autoHideMenuBar: true,

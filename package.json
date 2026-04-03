@@ -22,10 +22,14 @@
     "build:watchdog": "pkg watchdog/watchdog.js --target node18-win-x64 --output resources/watchdog.exe"
   },
   "dependencies": {
+    "@better-auth/electron": "^1.5.6",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/postcss": "^4.2.1",
     "axios": "^1.13.6",
+    "better-auth": "^1.5.6",
+    "conf": "^15.1.0",
+    "lucide-react": "^1.7.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "uuid": "^13.0.0",

@@ -6,10 +6,13 @@ import { getAppConfig, saveAppConfig } from './config/app.config'
 import { getDeviceConfig, saveDeviceConfig } from './config/device.config'
 import { getMacAddress } from './get-mac-address'
 import { createInitialSetupWindow } from './initial-setup.screen'
+import { authClient } from './lib/auth'
 import { createLockScreenWindow } from './lockscreen'
 import { registerDevice } from './services/device.service'
 import { setupTask } from './setup-task'
 import { initializeWebsocket } from './websocket'
+import { fetchBalance, stopTime, useTime } from './services/me.service'
+import { createTimerScreenWindow } from './timerscreen'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -38,9 +41,67 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  const appConfig = getAppConfig()
+  const deviceConfig = getDeviceConfig()
+
+  ipcMain.handle('get-app-config', () => appConfig)
+  ipcMain.handle('get-device-config', () => deviceConfig)
+
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('get-mac-address', () => getMacAddress())
+
+  ipcMain.handle('get-session', async () => {
+    const result = await authClient.getSession()
+    return result.data
+  })
+
+  ipcMain.handle(
+    'login',
+    async (_, formData: { email: string; password: string }): Promise<void> => {
+      await authClient.signIn.email({
+        email: formData.email,
+        password: formData.password
+      })
+    }
+  )
+
+  ipcMain.handle(
+    'register',
+    async (_, formData: { name: string; email: string; password: string }): Promise<void> => {
+      await authClient.signUp.email({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      })
+    }
+  )
+
+  ipcMain.handle('get-balance', async () => {
+    return await fetchBalance()
+  })
+
+  ipcMain.handle('resume-time', async () => {
+    createTimerScreenWindow()
+  })
+
+  ipcMain.handle('use-time', async () => {
+    if (deviceConfig) {
+      await useTime(deviceConfig.id)
+    }
+  })
+
+  ipcMain.handle('exit', async () => {
+    createLockScreenWindow()
+  })
+
+  ipcMain.handle('logout', async () => {
+    if (deviceConfig) {
+      await stopTime(deviceConfig.id)
+    }
+    await authClient.signOut()
+  })
+
   ipcMain.handle(
     'register-device',
     async (
@@ -88,12 +149,6 @@ app.whenReady().then(async () => {
   })
 
   setupTask()
-
-  const appConfig = getAppConfig()
-  const deviceConfig = getDeviceConfig()
-
-  ipcMain.handle('get-app-config', () => appConfig)
-  ipcMain.handle('get-device-config', () => deviceConfig)
 
   if (!appConfig || !deviceConfig) {
     createInitialSetupWindow()
