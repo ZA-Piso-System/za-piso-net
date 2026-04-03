@@ -42,7 +42,7 @@ export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
-        type="email"
+        type="text"
       />
       <input
         className="border border-gray-500 rounded-md px-2 py-1"
