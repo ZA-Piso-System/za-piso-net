@@ -7,6 +7,7 @@ export const authClient = createAuthClient({
   baseURL: `${getAppConfig()?.apiUrl}/auth`,
   plugins: [
     electronClient({
+      signInURL: '',
       protocol: {
         scheme: 'com.electron.app'
       },
