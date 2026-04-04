@@ -35,7 +35,7 @@ export default function App(): React.JSX.Element {
         {secondsToHMS(remaining)}
         <div className="absolute bottom-2">
           <button
-            className="bg-red-600 hover:bg-red-400 text-white p-2 rounded-md"
+            className="bg-gray-600 hover:bg-gray-400 text-white p-2 rounded-md"
             onClick={handleExit}
           >
             <LogOutIcon className="size-4" />
