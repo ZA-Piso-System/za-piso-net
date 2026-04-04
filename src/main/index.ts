@@ -96,6 +96,10 @@ app.whenReady().then(async () => {
   })
 
   ipcMain.handle('logout', async () => {
+    await authClient.signOut()
+  })
+
+  ipcMain.handle('save-and-logout', async () => {
     if (deviceConfig) {
       await stopTime(deviceConfig.id)
     }

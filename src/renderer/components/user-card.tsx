@@ -14,8 +14,12 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
   const [remaining, setRemaining] = useState<number>(0)
   const [balance, setBalance] = useState<BalanceResponse | null>(null)
 
+  const [isFetchingBalance, setIsFetchingBalance] = useState<boolean>(false)
   const [isUsingTime, setIsUsingTime] = useState<boolean>(false)
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false)
+  const [isSavingAndLoggingOut, setIsSavingAndLoggingOut] = useState<boolean>(false)
+
+  const isLoading = isFetchingBalance || isUsingTime || isLoggingOut || isSavingAndLoggingOut
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -46,8 +50,10 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
   }, [])
 
   const loadBalance = async (): Promise<void> => {
+    setIsFetchingBalance(true)
     const result = await window.electron.ipcRenderer.invoke('get-balance')
     setBalance(result)
+    setIsFetchingBalance(false)
   }
 
   const handleResume = (): void => {
@@ -59,9 +65,15 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
     window.electron.ipcRenderer.invoke('use-time')
   }
 
-  const handleSaveAndLogout = (): void => {
+  const handleLogout = (): void => {
     setIsLoggingOut(true)
     window.electron.ipcRenderer.invoke('logout')
+    setTimeout(() => onLogoutCallback(), 1_000)
+  }
+
+  const handleSaveAndLogout = (): void => {
+    setIsSavingAndLoggingOut(true)
+    window.electron.ipcRenderer.invoke('save-and-logout')
     setTimeout(() => onLogoutCallback(), 1_000)
   }
 
@@ -83,36 +95,46 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
               <p className="text-gray-500 text-sm">Balance Time</p>
             </div>
             <div>
-              <div className="text-2xl font-semibold font-mono">{balance?.points}</div>
+              <div className="text-2xl font-semibold font-mono">{balance?.points ?? 0}</div>
               <p className="text-gray-500 text-sm">Points</p>
             </div>
           </div>
         )}
       </div>
-      <div className="flex gap-4">
-        {remaining > 0 ? (
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-4">
+          {remaining > 0 ? (
+            <button
+              className="w-full bg-purple-600 hover:bg-purple-400 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+              onClick={handleResume}
+            >
+              Resume
+            </button>
+          ) : (
+            <button
+              className="w-full bg-purple-600 hover:bg-purple-400 disabled:bg-purple-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+              onClick={handleUseTime}
+              disabled={isLoading || (balance?.balanceSeconds ?? 0) === 0}
+            >
+              {isUsingTime && <LucideLoader className="animate-spin size-4" />}
+              Use Time
+            </button>
+          )}
           <button
-            className="w-full bg-purple-600 hover:bg-purple-400 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
-            onClick={handleResume}
+            className="w-full bg-gray-600 hover:bg-gray-400 disabled:bg-gray-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+            onClick={handleLogout}
+            disabled={isLoading}
           >
-            Resume
+            {isLoggingOut && <LucideLoader className="animate-spin size-4" />}
+            Logout
           </button>
-        ) : (
-          <button
-            className="w-full bg-purple-600 hover:bg-purple-400 disabled:bg-purple-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
-            onClick={handleUseTime}
-            disabled={(balance?.balanceSeconds ?? 0) === 0 || isUsingTime}
-          >
-            {isUsingTime && <LucideLoader className="animate-spin size-4" />}
-            Use Time
-          </button>
-        )}
+        </div>
         <button
-          className="w-full bg-red-600 hover:bg-red-400 disabled:bg-red-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+          className="w-full bg-green-600 hover:bg-green-400 disabled:bg-green-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
           onClick={handleSaveAndLogout}
-          disabled={isLoggingOut}
+          disabled={isLoading}
         >
-          {isLoggingOut && <LucideLoader className="animate-spin size-4" />}
+          {isSavingAndLoggingOut && <LucideLoader className="animate-spin size-4" />}
           Save & Logout
         </button>
       </div>
