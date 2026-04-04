@@ -44,6 +44,7 @@ app.whenReady().then(async () => {
   const appConfig = getAppConfig()
   const deviceConfig = getDeviceConfig()
 
+  ipcMain.handle('get-app-version', () => app.getVersion())
   ipcMain.handle('get-app-config', () => appConfig)
   ipcMain.handle('get-device-config', () => deviceConfig)
 

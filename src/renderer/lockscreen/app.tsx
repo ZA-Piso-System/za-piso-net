@@ -11,6 +11,7 @@ export default function App(): React.JSX.Element {
   const appConfig = useAppConfig()
   const deviceConfig = useDeviceConfig()
 
+  const [version, setVersion] = useState<string>('')
   const [session, setSession] = useState<Session | null>(null)
 
   const [images, setImages] = useState<string[]>([])
@@ -22,6 +23,7 @@ export default function App(): React.JSX.Element {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
     loadSession()
+    window.electron.ipcRenderer.invoke('get-app-version').then(setVersion)
   }, [])
 
   useEffect(() => {
@@ -94,6 +96,9 @@ export default function App(): React.JSX.Element {
               }}
             />
           )}
+        </div>
+        <div className="absolute bottom-2 right-2 text-sm text-gray-500 font-medium">
+          v{version}
         </div>
       </div>
       <div className="absolute top-10 right-10">
