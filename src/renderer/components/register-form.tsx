@@ -11,8 +11,10 @@ export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [confirmPassword, setConfirmPassword] = useState<string>('')
 
   const handleRegister = async (): Promise<void> => {
+    if (password !== confirmPassword) return
     setLoading(true)
     await window.electron.ipcRenderer.invoke('register', { name, email, password })
     onRegisterCallback()
@@ -49,6 +51,13 @@ export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
+        type="password"
+      />
+      <input
+        className="border border-gray-500 rounded-md px-2 py-1"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="Confirm Password"
         type="password"
       />
       <button
