@@ -38,7 +38,7 @@ export default function App(): React.JSX.Element {
             className="bg-gray-600 hover:bg-gray-400 text-white p-2 rounded-md"
             onClick={handleExit}
           >
-            <LogOutIcon className="size-4" />
+            <LogOutIcon size={16} />
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { secondsToHMS } from '@renderer/utils/number.util'
-import { LucideLoader } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, LucideLoader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface Props {
@@ -13,6 +13,8 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
   const [password, setPassword] = useState<string>('')
 
   const [remaining, setRemaining] = useState<number>(0)
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
 
   useEffect(() => {
     const unsubscribe = window.electron.ipcRenderer.on(
@@ -66,13 +68,26 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
         placeholder="Email"
         type="text"
       />
-      <input
-        className="border border-gray-500 rounded-md px-2 py-1"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        type="password"
-      />
+      <div className="relative">
+        <input
+          className="w-full border border-gray-500 rounded-md px-2 py-1"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          type={isPasswordVisible ? 'text' : 'password'}
+        />
+        <button
+          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+          onClick={() => setIsPasswordVisible((prev) => !prev)}
+        >
+          {isPasswordVisible ? (
+            <EyeOffIcon size={16} aria-hidden="true" />
+          ) : (
+            <EyeIcon size={16} aria-hidden="true" />
+          )}
+        </button>
+      </div>
       <button
         className="w-full bg-purple-600 hover:bg-purple-400 disabled:bg-purple-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
         onClick={handleLogin}
