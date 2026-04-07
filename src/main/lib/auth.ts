@@ -2,6 +2,7 @@ import { electronClient } from '@better-auth/electron/client'
 import { storage } from '@better-auth/electron/storage'
 import { createAuthClient } from 'better-auth/client'
 import { getAppConfig } from '../config/app.config'
+import { usernameClient } from 'better-auth/client/plugins'
 
 export const authClient = createAuthClient({
   baseURL: `${getAppConfig()?.apiUrl}/auth`,
@@ -12,6 +13,7 @@ export const authClient = createAuthClient({
         scheme: 'com.electron.app'
       },
       storage: storage()
-    })
+    }),
+    usernameClient()
   ]
 })

@@ -59,21 +59,32 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(
     'login',
-    async (_, formData: { email: string; password: string }): Promise<void> => {
-      await authClient.signIn.email({
-        email: formData.email,
-        password: formData.password
-      })
+    async (_, formData: { emailOrUsername: string; password: string }): Promise<void> => {
+      if (formData.emailOrUsername.includes('@')) {
+        await authClient.signIn.email({
+          email: formData.emailOrUsername,
+          password: formData.password
+        })
+      } else {
+        await authClient.signIn.username({
+          username: formData.emailOrUsername,
+          password: formData.password
+        })
+      }
     }
   )
 
   ipcMain.handle(
     'register',
-    async (_, formData: { name: string; email: string; password: string }): Promise<void> => {
+    async (
+      _,
+      formData: { name: string; email: string; password: string; username: string }
+    ): Promise<void> => {
       await authClient.signUp.email({
         name: formData.name,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        username: formData.username
       })
     }
   )

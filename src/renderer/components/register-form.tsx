@@ -9,6 +9,7 @@ interface Props {
 export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React.JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
   const [name, setName] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
@@ -19,7 +20,7 @@ export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React
   const handleRegister = async (): Promise<void> => {
     if (password !== confirmPassword) return
     setLoading(true)
-    await window.electron.ipcRenderer.invoke('register', { name, email, password })
+    await window.electron.ipcRenderer.invoke('register', { name, username, email, password })
     onRegisterCallback()
     setLoading(false)
   }
@@ -40,6 +41,13 @@ export const RegisterForm = ({ onSwitchForm, onRegisterCallback }: Props): React
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Name"
+        type="text"
+      />
+      <input
+        className="border border-gray-500 rounded-md px-2 py-1"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
         type="text"
       />
       <input

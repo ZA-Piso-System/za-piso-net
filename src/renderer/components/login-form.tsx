@@ -9,7 +9,7 @@ interface Props {
 
 export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
-  const [email, setEmail] = useState<string>('')
+  const [emailOrUsername, setEmailOrUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
   const [remaining, setRemaining] = useState<number>(0)
@@ -41,7 +41,7 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
 
   const handleLogin = async (): Promise<void> => {
     setLoading(true)
-    await window.electron.ipcRenderer.invoke('login', { email, password })
+    await window.electron.ipcRenderer.invoke('login', { emailOrUsername, password })
     onLoginCallback()
     setLoading(false)
   }
@@ -63,9 +63,9 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
       </div>
       <input
         className="border border-gray-500 rounded-md px-2 py-1"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
+        value={emailOrUsername}
+        onChange={(e) => setEmailOrUsername(e.target.value)}
+        placeholder="Email or Username"
         type="text"
       />
       <div className="relative">
