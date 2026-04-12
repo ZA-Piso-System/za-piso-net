@@ -1,4 +1,5 @@
 import { LoginForm } from '@renderer/components/login-form'
+import { PointsPackages } from '@renderer/components/points-packages'
 import { RegisterForm } from '@renderer/components/register-form'
 import { UserCard } from '@renderer/components/user-card'
 import { useAppConfig } from '@renderer/hooks/useAppConfig'

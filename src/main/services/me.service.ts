@@ -15,3 +15,8 @@ export const stopTime = async (id: string): Promise<unknown> => {
   const response = await axiosInstance.post('/user/me/stop-time', { id })
   return response.data
 }
+
+export const redeemPointsPackage = async (id: string): Promise<unknown> => {
+  const response = await axiosInstance.post(`/user/me/points-packages/${id}/redeem`)
+  return response.data
+}

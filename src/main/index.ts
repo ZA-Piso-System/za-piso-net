@@ -11,8 +11,9 @@ import { createLockScreenWindow } from './lockscreen'
 import { registerDevice } from './services/device.service'
 import { setupTask } from './setup-task'
 import { initializeWebsocket } from './websocket'
-import { fetchBalance, stopTime, useTime } from './services/me.service'
+import { fetchBalance, redeemPointsPackage, stopTime, useTime } from './services/me.service'
 import { createTimerScreenWindow } from './timerscreen'
+import { fetchPointsPackages } from './services/points-packages.service'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -101,6 +102,14 @@ app.whenReady().then(async () => {
     if (deviceConfig) {
       await useTime(deviceConfig.id)
     }
+  })
+
+  ipcMain.handle('fetch-points-packages', async () => {
+    return await fetchPointsPackages()
+  })
+
+  ipcMain.handle('redeem-points-package', async (_, id) => {
+    await redeemPointsPackage(id)
   })
 
   ipcMain.handle('exit', async () => {
