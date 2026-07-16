@@ -14,6 +14,7 @@ import { initializeWebsocket } from './websocket'
 import { fetchBalance, redeemPointsPackage, stopTime, useTime } from './services/me.service'
 import { createTimerScreenWindow } from './timerscreen'
 import { fetchPointsPackages } from './services/points-packages.service'
+import { fetchTotalInsertedCoins, insertCoin, insertCoinDone } from './services/coin-slot.service'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -125,6 +126,22 @@ app.whenReady().then(async () => {
       await stopTime(deviceConfig.id)
     }
     await authClient.signOut()
+  })
+
+  ipcMain.handle('fetch-total-inserted-coins', async () => {
+    return await fetchTotalInsertedCoins()
+  })
+
+  ipcMain.handle('insert-coin', async () => {
+    if (deviceConfig) {
+      return await insertCoin(deviceConfig.id, 'device')
+    }
+  })
+
+  ipcMain.handle('insert-coin-done', async () => {
+    if (deviceConfig) {
+      return await insertCoinDone(deviceConfig.id)
+    }
   })
 
   ipcMain.handle(

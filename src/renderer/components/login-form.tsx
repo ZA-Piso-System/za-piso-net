@@ -1,6 +1,12 @@
+import { QueryKey } from '@common/types/query-key.type'
+import { InsertCoin } from '@renderer/components/insert-coin'
 import { secondsToHMS } from '@renderer/utils/number.util'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { EyeIcon, EyeOffIcon, LucideLoader } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+const COUNTDOWN = 30
+const COOLDOWN = 5
 
 interface Props {
   onSwitchForm: () => void
@@ -8,6 +14,8 @@ interface Props {
 }
 
 export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.Element => {
+  const queryClient = useQueryClient()
+
   const [loading, setLoading] = useState<boolean>(false)
   const [emailOrUsername, setEmailOrUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -15,6 +23,17 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
   const [remaining, setRemaining] = useState<number>(0)
 
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
+
+  const [countdown, setCountdown] = useState<number>(COUNTDOWN)
+  const [cooldown, setCooldown] = useState<number>(COOLDOWN)
+  const [showInsertCoin, setShowInsertCoin] = useState<boolean>(false)
+
+  const insertCoinMutation = useMutation({
+    mutationFn: () => window.electron.ipcRenderer.invoke('insert-coin'),
+    onSuccess: () => {
+      setShowInsertCoin(true)
+    }
+  })
 
   useEffect(() => {
     const unsubscribe = window.electron.ipcRenderer.on(
@@ -39,6 +58,28 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
     }
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 0) {
+          setShowInsertCoin(false)
+          queryClient.resetQueries({ queryKey: [QueryKey.CoinSlots] })
+          return 0
+        }
+        return prev - 1
+      })
+
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    setCountdown(COUNTDOWN)
+    setCooldown(COOLDOWN)
+  }, [showInsertCoin])
+
   const handleLogin = async (): Promise<void> => {
     setLoading(true)
     await window.electron.ipcRenderer.invoke('login', { emailOrUsername, password })
@@ -48,6 +89,10 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
 
   const handleResume = (): void => {
     window.electron.ipcRenderer.invoke('resume-time')
+  }
+
+  const handleInsertCoin = (): void => {
+    insertCoinMutation.mutate()
   }
 
   return (
@@ -110,6 +155,22 @@ export const LoginForm = ({ onSwitchForm, onLoginCallback }: Props): React.JSX.E
             Resume
           </button>
         </div>
+      )}
+      <button
+        className="w-full bg-amber-600 hover:bg-amber-400 disabled:bg-amber-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+        onClick={handleInsertCoin}
+        disabled={loading}
+      >
+        Insert Coin
+      </button>
+      {showInsertCoin && (
+        <InsertCoin
+          setShowInsertCoin={setShowInsertCoin}
+          countdown={countdown}
+          setCountdown={setCountdown}
+          cooldown={cooldown}
+          setCooldown={setCooldown}
+        />
       )}
     </div>
   )

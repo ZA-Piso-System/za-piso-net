@@ -18,6 +18,7 @@ export default defineConfig({
     },
     resolve: {
       alias: {
+        '@common': resolve('src/common'),
         '@renderer': resolve('src/renderer')
       }
     },
