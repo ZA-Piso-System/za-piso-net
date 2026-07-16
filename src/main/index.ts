@@ -133,6 +133,10 @@ app.whenReady().then(async () => {
   })
 
   ipcMain.handle('insert-coin', async () => {
+    const result = await authClient.getSession()
+    if (result.data) {
+      return await insertCoin(result.data.user.id, 'user')
+    }
     if (deviceConfig) {
       return await insertCoin(deviceConfig.id, 'device')
     }

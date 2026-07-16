@@ -1,8 +1,14 @@
+import { QueryKey } from '@common/types/query-key.type'
 import { PointsPackages } from '@renderer/components/points-packages'
+import { TopUp } from '@renderer/components/top-up'
 import { secondsToHMS } from '@renderer/utils/number.util'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LucideLoader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { BalanceResponse } from 'src/common/types/user.type'
+
+const COUNTDOWN = 30
+const COOLDOWN = 5
 
 interface Props {
   user: {
@@ -12,6 +18,8 @@ interface Props {
 }
 
 export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element => {
+  const queryClient = useQueryClient()
+
   const [remaining, setRemaining] = useState<number>(0)
   const [balance, setBalance] = useState<BalanceResponse | null>(null)
 
@@ -23,8 +31,19 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false)
   const [isSavingAndLoggingOut, setIsSavingAndLoggingOut] = useState<boolean>(false)
 
+  const [countdown, setCountdown] = useState<number>(COUNTDOWN)
+  const [cooldown, setCooldown] = useState<number>(COOLDOWN)
+  const [showInsertCoin, setShowInsertCoin] = useState<boolean>(false)
+
   const isLoading =
     isFetchingBalance || isUsingTime || isRedeemingPoints || isLoggingOut || isSavingAndLoggingOut
+
+  const insertCoinMutation = useMutation({
+    mutationFn: () => window.electron.ipcRenderer.invoke('insert-coin'),
+    onSuccess: () => {
+      setShowInsertCoin(true)
+    }
+  })
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -53,6 +72,28 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
       unsubscribe()
     }
   }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 0) {
+          setShowInsertCoin(false)
+          queryClient.resetQueries({ queryKey: [QueryKey.CoinSlots] })
+          return 0
+        }
+        return prev - 1
+      })
+
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    setCountdown(COUNTDOWN)
+    setCooldown(COOLDOWN)
+  }, [showInsertCoin])
 
   const loadBalance = async (): Promise<void> => {
     setIsFetchingBalance(true)
@@ -94,6 +135,10 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
     setIsSavingAndLoggingOut(true)
     window.electron.ipcRenderer.invoke('save-and-logout')
     setTimeout(() => onLogoutCallback(), 1_000)
+  }
+
+  const handleInsertCoin = (): void => {
+    insertCoinMutation.mutate()
   }
 
   return (
@@ -165,11 +210,33 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
             </button>
           </div>
         )}
+        <button
+          className="w-full bg-amber-600 hover:bg-amber-400 disabled:bg-amber-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+          onClick={handleInsertCoin}
+          disabled={isLoading}
+        >
+          Top Up
+        </button>
       </div>
       {showPointsPackage && (
         <PointsPackages
           onSelectCallback={handleRedeemPointsPackage}
           onCloseCallback={() => setShowPointsPackage(false)}
+        />
+      )}
+      {showInsertCoin && (
+        <TopUp
+          user={user}
+          setShowInsertCoin={setShowInsertCoin}
+          countdown={countdown}
+          setCountdown={setCountdown}
+          cooldown={cooldown}
+          setCooldown={setCooldown}
+          onComplete={() => {
+            setTimeout(() => {
+              loadBalance()
+            }, 1_000)
+          }}
         />
       )}
     </div>
