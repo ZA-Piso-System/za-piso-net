@@ -44,7 +44,7 @@ export const TopUp = ({
     onSuccess: () => {
       setTimeout(() => {
         queryClient.resetQueries({ queryKey: [QueryKey.CoinSlots] })
-      }, 1_000)
+      }, 2_000)
       onComplete()
     }
   })
