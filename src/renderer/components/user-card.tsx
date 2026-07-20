@@ -29,14 +29,16 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
   const [isUsingTime, setIsUsingTime] = useState<boolean>(false)
   const [isRedeemingPoints, setIsRedeemingPoints] = useState<boolean>(false)
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false)
-  const [isSavingAndLoggingOut, setIsSavingAndLoggingOut] = useState<boolean>(false)
+  // const [isSavingAndLoggingOut, setIsSavingAndLoggingOut] = useState<boolean>(false)
 
   const [countdown, setCountdown] = useState<number>(COUNTDOWN)
   const [cooldown, setCooldown] = useState<number>(COOLDOWN)
   const [showInsertCoin, setShowInsertCoin] = useState<boolean>(false)
 
-  const isLoading =
-    isFetchingBalance || isUsingTime || isRedeemingPoints || isLoggingOut || isSavingAndLoggingOut
+  // const isLoading =
+  //   isFetchingBalance || isUsingTime || isRedeemingPoints || isLoggingOut || isSavingAndLoggingOut
+
+  const isLoading = isFetchingBalance || isUsingTime || isRedeemingPoints || isLoggingOut
 
   const insertCoinMutation = useMutation({
     mutationFn: () => window.electron.ipcRenderer.invoke('insert-coin'),
@@ -131,11 +133,11 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
     setTimeout(() => onLogoutCallback(), 1_000)
   }
 
-  const handleSaveAndLogout = (): void => {
-    setIsSavingAndLoggingOut(true)
-    window.electron.ipcRenderer.invoke('save-and-logout')
-    setTimeout(() => onLogoutCallback(), 1_000)
-  }
+  // const handleSaveAndLogout = (): void => {
+  //   setIsSavingAndLoggingOut(true)
+  //   window.electron.ipcRenderer.invoke('save-and-logout')
+  //   setTimeout(() => onLogoutCallback(), 1_000)
+  // }
 
   const handleInsertCoin = (): void => {
     insertCoinMutation.mutate()
@@ -186,14 +188,16 @@ export const UserCard = ({ user, onLogoutCallback }: Props): React.JSX.Element =
           {isLoggingOut && <LucideLoader className="animate-spin size-4" />}
           Logout
         </button>
-        <button
-          className="w-full bg-green-600 hover:bg-green-400 disabled:bg-green-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
-          onClick={handleSaveAndLogout}
-          disabled={isLoading}
-        >
-          {isSavingAndLoggingOut && <LucideLoader className="animate-spin size-4" />}
-          Save & Logout
-        </button>
+        {
+          // <button
+          //   className="w-full bg-green-600 hover:bg-green-400 disabled:bg-green-300 flex justify-center items-center gap-2 text-white text-sm rounded-md px-4 py-2"
+          //   onClick={handleSaveAndLogout}
+          //   disabled={isLoading}
+          // >
+          //   {isSavingAndLoggingOut && <LucideLoader className="animate-spin size-4" />}
+          //   Save & Logout
+          // </button>
+        }
         {remaining > 0 && (
           <div className="flex flex-col gap-4">
             <hr />
